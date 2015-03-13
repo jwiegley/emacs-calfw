@@ -75,9 +75,10 @@ different agenda files from the default agenda ones.")
                 append
                 (progn
                   (org-check-agenda-file file)
-                  (apply 'org-agenda-get-day-entries
-                         file date
-                         cfw:org-agenda-schedule-args))))))
+                  (remove-if (lambda (x) (not (string-match " APPT " x)))
+                             (apply 'org-agenda-get-day-entries
+                                    file date
+                                    cfw:org-agenda-schedule-args)))))))
 
 (defun cfw:org-onclick ()
   "Jump to the clicked org item."
@@ -160,6 +161,10 @@ different agenda files from the default agenda ones.")
           (setq text (replace-regexp-in-string (concat ":" (elt tags i) ":") "" text))
           (setq i (+ i 1)))
         (setq text (replace-regexp-in-string "[\t ]*:?$" "" text))))
+    ;;; ------------------------------------------------------------------------
+    ;;; remove APPT keyword
+    ;;; ------------------------------------------------------------------------
+    (setq text (replace-regexp-in-string "APPT " "" text))
     ;;; ------------------------------------------------------------------------
     ;;; act for org link
     ;;; ------------------------------------------------------------------------
@@ -382,8 +387,8 @@ TEXT1 < TEXT2. This function makes no-time items in front of timed-items."
                                                 (calendar-extract-year pos)))
               ">"))))
 
-(setq org-capture-templates
-      (append org-capture-templates (list cfw:org-capture-template)))
+;; (setq org-capture-templates
+;;       (append org-capture-templates (list cfw:org-capture-template)))
 
 (defun cfw:org-capture ()
   "Open org-agenda buffer on the selected date."
